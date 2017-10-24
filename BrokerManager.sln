@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokerManager", "BrokerManager\BrokerManager.csproj", "{49EAE05B-5ECF-47D3-8CEB-90CA43365FDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrokerManager", "BrokerManager\BrokerManager.csproj", "{49EAE05B-5ECF-47D3-8CEB-90CA43365FDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokerManagerTest", "BrokerManagerTest\BrokerManagerTest.csproj", "{ABA4552B-F5F3-45CE-8F7E-7CAC07BB8BC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{49EAE05B-5ECF-47D3-8CEB-90CA43365FDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49EAE05B-5ECF-47D3-8CEB-90CA43365FDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49EAE05B-5ECF-47D3-8CEB-90CA43365FDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABA4552B-F5F3-45CE-8F7E-7CAC07BB8BC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABA4552B-F5F3-45CE-8F7E-7CAC07BB8BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABA4552B-F5F3-45CE-8F7E-7CAC07BB8BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABA4552B-F5F3-45CE-8F7E-7CAC07BB8BC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
