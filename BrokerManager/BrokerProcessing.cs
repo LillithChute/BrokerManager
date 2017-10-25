@@ -17,6 +17,9 @@ namespace BrokerManager
         static void Main(string[] args)
         {
             ServiceProvider serviceProvider = GetServiceConfiguration();
+            List<Broker> processedBrokers = new List<Broker>();
+
+            System.Console.WriteLine("Begin proccess...");
 
             // Get the data file.  In a real scenario this would be fed in via file upload or as a batch load etc.
             TextReader fileReader;
@@ -24,7 +27,7 @@ namespace BrokerManager
             try
             {
                 fileReader = File.OpenText("C:\\Resources\\DataToUpload.csv");
-                fileWriter = File.CreateText("C:\\Resources\\GroupedBrokers.csv");
+                fileWriter = File.CreateText("C:\\Resources\\GroupedBrokersNew.csv");
             }
             catch (System.Exception)
             {
@@ -45,66 +48,80 @@ namespace BrokerManager
             csvRead.Configuration.MissingFieldFound = null;
             csvRead.Configuration.HeaderValidated = null;
 
-            System.Console.WriteLine("Reading data file...");
-
-            // Read in the data
             var brokerRecords = new List<Broker>();
             try
             {
+                // Read in the data
+                System.Console.WriteLine("Reading data file...");
                 brokerRecords = csvRead.GetRecords<Broker>().ToList();
+
+                // Group
+                System.Console.WriteLine("Grouping brokers...");
+                List<List<Broker>> groups = GroupBrokers(brokerRecords);
+
+                // Assign group ID
+                System.Console.WriteLine("Assigning group ID...");
+                AssignGroupId(processedBrokers, groups);
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
-                throw new System.Exception("Unable to read data records.");
+                throw new System.Exception("Unable to read data records: " + e.Message);
             }
-
-            // Group the records
-            System.Console.WriteLine("Grouping brokers.");
-
-            //  This is really, really slow but it will be effective as a quick and dirty.  I think this is an O(n^2).  Eew.
-            GroupBrokers(brokerRecords);
 
             System.Console.WriteLine("Writing data file...");
 
-            csvWrite.WriteRecords(brokerRecords);
+            csvWrite.WriteRecords(processedBrokers);
 
             System.Console.WriteLine("Process complete.");
         }
 
-        //  Do the actual grouping within the model.
-        private static void GroupBrokers(System.Collections.Generic.List<Broker> brokerRecords)
+        #region Proccess Broker Data
+        private static void AssignGroupId(List<Broker> processedBrokers, List<List<Broker>> groups)
         {
-            try
+            int count = 0;
+            foreach (var records in groups)
             {
-                var groupId = 0;
-                foreach (var broker in brokerRecords)
+                foreach (var record in records)
                 {
-                    brokerRecords.Where(
-                        w =>
-                        w.INS_BROKER_NAME == broker.INS_BROKER_NAME &&
-                        w.INS_BROKER_US_ADDRESS1 == broker.INS_BROKER_US_ADDRESS1 &&
-                        w.INS_BROKER_US_ADDRESS2 == broker.INS_BROKER_US_ADDRESS2 &&
-                        w.INS_BROKER_US_CITY == broker.INS_BROKER_US_CITY &&
-                        w.INS_BROKER_US_STATE == broker.INS_BROKER_US_STATE &&
-                        w.INS_BROKER_US_ZIP == broker.INS_BROKER_US_ZIP &&
-                        w.INS_BROKER_FOREIGN_ADDRESS1 == broker.INS_BROKER_FOREIGN_ADDRESS1 &&
-                        w.INS_BROKER_FOREIGN_ADDRESS2 == broker.INS_BROKER_FOREIGN_ADDRESS2 &&
-                        w.INS_BROKER_FOREIGN_CITY == broker.INS_BROKER_FOREIGN_CITY &&
-                        w.INS_BROKER_FOREIGN_CNTRY == broker.INS_BROKER_FOREIGN_CNTRY &&
-                        w.INS_BROKER_FOREIGN_POSTAL_CD == broker.INS_BROKER_FOREIGN_POSTAL_CD &&
-                        w.INS_BROKER_FOREIGN_PROV_STATE == broker.INS_BROKER_FOREIGN_PROV_STATE
-                        )
-                        .ToList()
-                        .ForEach(f => f.GROUP_ID = groupId.ToString());
+                    try
+                    {
+                        record.GROUP_ID = count.ToString();
 
-                    groupId += 1;
+                        // Group ID is assigned add the broker to the final list
+                        processedBrokers.Add(record);
+                    }
+                    catch (System.Exception)
+                    {
+                        throw new System.Exception("Group ID assignment failed.");
+                    }
                 }
-            }
-            catch (System.Exception)
-            {
-                throw new System.Exception("Grouping failed.");
+
+                count++;
             }
         }
+
+        private static List<List<Broker>> GroupBrokers(List<Broker> brokerRecords)
+        {
+            // We have to assume that we need to group not only on US Addresses but foreign as well so add those in.
+            return brokerRecords.GroupBy(c => new
+            {
+                c.INS_BROKER_NAME,
+                c.INS_BROKER_US_ADDRESS1,
+                c.INS_BROKER_US_ADDRESS2,
+                c.INS_BROKER_US_CITY,
+                c.INS_BROKER_US_STATE,
+                c.INS_BROKER_US_ZIP,
+                c.INS_BROKER_FOREIGN_ADDRESS1,
+                c.INS_BROKER_FOREIGN_ADDRESS2,
+                c.INS_BROKER_FOREIGN_CITY,
+                c.INS_BROKER_FOREIGN_PROV_STATE,
+                c.INS_BROKER_FOREIGN_POSTAL_CD,
+                c.INS_BROKER_FOREIGN_CNTRY
+            })
+                    .Select(group => group.ToList())
+                    .ToList();
+        }
+        #endregion
 
         #region Configuration
         private static ServiceProvider GetServiceConfiguration()
