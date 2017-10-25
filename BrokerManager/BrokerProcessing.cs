@@ -6,6 +6,7 @@ using System.Linq;
 using CsvHelper;
 using BrokerManager.Models;
 using BrokerManager.Services;
+using System.Collections.Generic;
 
 namespace BrokerManager
 {
@@ -18,8 +19,17 @@ namespace BrokerManager
             ServiceProvider serviceProvider = GetServiceConfiguration();
 
             // Get the data file.  In a real scenario this would be fed in via file upload or as a batch load etc.
-            TextReader fileReader = File.OpenText("C:\\Resources\\DataToUpload.csv");
-            StreamWriter fileWriter = File.CreateText("C:\\Resources\\GroupedBrokers.csv");
+            TextReader fileReader;
+            StreamWriter fileWriter;
+            try
+            {
+                fileReader = File.OpenText("C:\\Resources\\DataToUpload.csv");
+                fileWriter = File.CreateText("C:\\Resources\\GroupedBrokers.csv");
+            }
+            catch (System.Exception)
+            {
+                throw new System.Exception("Unable to set up filereader/filewriter.");
+            }
 
             // Don't set up mapping for now.  Would set up multiple mappings depending on company if this were real.
             var csvRead = new CsvReader(fileReader);
@@ -38,7 +48,15 @@ namespace BrokerManager
             System.Console.WriteLine("Reading data file...");
 
             // Read in the data
-            var brokerRecords = csvRead.GetRecords<Broker>().ToList();
+            var brokerRecords = new List<Broker>();
+            try
+            {
+                brokerRecords = csvRead.GetRecords<Broker>().ToList();
+            }
+            catch (System.Exception)
+            {
+                throw new System.Exception("Unable to read data records.");
+            }
 
             // Group the records
             System.Console.WriteLine("Grouping brokers.");
