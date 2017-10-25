@@ -56,28 +56,35 @@ namespace BrokerManager
         //  Do the actual grouping within the model.
         private static void GroupBrokers(System.Collections.Generic.List<Broker> brokerRecords)
         {
-            var groupId = 0;
-            foreach (var broker in brokerRecords)
+            try
             {
-                brokerRecords.Where(
-                    w =>
-                    w.INS_BROKER_NAME == broker.INS_BROKER_NAME &&
-                    w.INS_BROKER_US_ADDRESS1 == broker.INS_BROKER_US_ADDRESS1 &&
-                    w.INS_BROKER_US_ADDRESS2 == broker.INS_BROKER_US_ADDRESS2 &&
-                    w.INS_BROKER_US_CITY == broker.INS_BROKER_US_CITY &&
-                    w.INS_BROKER_US_STATE == broker.INS_BROKER_US_STATE &&
-                    w.INS_BROKER_US_ZIP == broker.INS_BROKER_US_ZIP &&
-                    w.INS_BROKER_FOREIGN_ADDRESS1 == broker.INS_BROKER_FOREIGN_ADDRESS1 &&
-                    w.INS_BROKER_FOREIGN_ADDRESS2 == broker.INS_BROKER_FOREIGN_ADDRESS2 &&
-                    w.INS_BROKER_FOREIGN_CITY == broker.INS_BROKER_FOREIGN_CITY &&
-                    w.INS_BROKER_FOREIGN_CNTRY == broker.INS_BROKER_FOREIGN_CNTRY &&
-                    w.INS_BROKER_FOREIGN_POSTAL_CD == broker.INS_BROKER_FOREIGN_POSTAL_CD &&
-                    w.INS_BROKER_FOREIGN_PROV_STATE == broker.INS_BROKER_FOREIGN_PROV_STATE
-                    )
-                    .ToList()
-                    .ForEach(f => f.GROUP_ID = groupId.ToString());
+                var groupId = 0;
+                foreach (var broker in brokerRecords)
+                {
+                    brokerRecords.Where(
+                        w =>
+                        w.INS_BROKER_NAME == broker.INS_BROKER_NAME &&
+                        w.INS_BROKER_US_ADDRESS1 == broker.INS_BROKER_US_ADDRESS1 &&
+                        w.INS_BROKER_US_ADDRESS2 == broker.INS_BROKER_US_ADDRESS2 &&
+                        w.INS_BROKER_US_CITY == broker.INS_BROKER_US_CITY &&
+                        w.INS_BROKER_US_STATE == broker.INS_BROKER_US_STATE &&
+                        w.INS_BROKER_US_ZIP == broker.INS_BROKER_US_ZIP &&
+                        w.INS_BROKER_FOREIGN_ADDRESS1 == broker.INS_BROKER_FOREIGN_ADDRESS1 &&
+                        w.INS_BROKER_FOREIGN_ADDRESS2 == broker.INS_BROKER_FOREIGN_ADDRESS2 &&
+                        w.INS_BROKER_FOREIGN_CITY == broker.INS_BROKER_FOREIGN_CITY &&
+                        w.INS_BROKER_FOREIGN_CNTRY == broker.INS_BROKER_FOREIGN_CNTRY &&
+                        w.INS_BROKER_FOREIGN_POSTAL_CD == broker.INS_BROKER_FOREIGN_POSTAL_CD &&
+                        w.INS_BROKER_FOREIGN_PROV_STATE == broker.INS_BROKER_FOREIGN_PROV_STATE
+                        )
+                        .ToList()
+                        .ForEach(f => f.GROUP_ID = groupId.ToString());
 
-                groupId += 1;
+                    groupId += 1;
+                }
+            }
+            catch (System.Exception)
+            {
+                throw new System.Exception("Grouping failed.");
             }
         }
 
